@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.generic import ListView
 
-from .forms import PostBaseForm
+from .forms import PostBaseForm , PostCreateForm
 from .models import Post
 
 
@@ -23,7 +23,7 @@ def post_list_view(request):
 def post_detail_view(request, id):
     post = Post.objects.get(id=id)
     context = {
-        'post': post
+        'post': post,
     }
     return render(request, 'posts/post_detail.html', context)
 
@@ -42,6 +42,24 @@ def post_create_view(request):
             writer=request.user,
         )
 
+        return redirect('index')
+    
+def post_create_form_view(request):
+    if request.method == 'GET':
+        form = PostCreateForm()
+        context = {'form': form}
+        return render(request, 'posts/post_form2.html', context)
+    else:
+        form = PostCreateForm(request.POST, request.FILES)
+        
+        if form.is_valid():    
+            Post.objects.create(
+                image=form.cleaned_data['image'],
+                content=form.cleaned_data['content'],
+                writer=request.user,
+            )
+        else:
+            return redirect('posts:post-create')
         return redirect('index')
 
 
