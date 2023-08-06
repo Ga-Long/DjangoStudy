@@ -19,13 +19,26 @@ def index(request):
 def post_list_view(request):
     return render(request, 'posts/post_list.html')
 
+# def post_detail_view(request, id):
+#     if request.method == 'GET':      
+#         if request.user.is_authenticated:
+#             post = Post.objects.get(id=id)
+#             context = {
+#                 'post': post,
+#             }
+#             return render(request, 'posts/post_detail.html', context)
+#         else:
+#             return redirect('accounts:login')
 
-def post_detail_view(request, id):
+
+@login_required(login_url='accounts:login')
+def post_detail_view(request, id):        
     post = Post.objects.get(id=id)
     context = {
         'post': post,
     }
     return render(request, 'posts/post_detail.html', context)
+
 
 
 @login_required

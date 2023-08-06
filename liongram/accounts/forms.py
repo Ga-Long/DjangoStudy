@@ -16,7 +16,7 @@ class UserCreateForm(UserBaseForm):
         fields = ['username', 'email', 'password']
 
 
-class SingUpForm(UserCreationForm):
+class SingUpForm(UserCreationForm): #UserCreationForm 이걸 상속받았다. 여기엔 email이 필수지 않아서 custom 해줘야함
     class Meta(UserCreationForm.Meta):
         model = get_user_model()
         fields = ['username', 'email']
