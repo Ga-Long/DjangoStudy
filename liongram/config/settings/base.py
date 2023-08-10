@@ -1,33 +1,50 @@
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
+import json
+
+# 운영환경과 상관없이 바뀌지 않는 부분들
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
+secret_file = BASE_DIR / 'secrets.json'
+with open(secret_file) as file: # secrets 파일 읽어와서 json으로 처리 
+    secrets = json.load(file.read())
+    
+# secret 가져오다가 생기는 오류 확인
+def get_secret(setting, secrets_dict=secrets):
+    try:
+        return secrets_dict[setting]
+    except KeyError: # key가 없는 경우
+        error_msg = f'Set the {setting} environment variable'
+        raise ImproperlyConfigured(error_msg)
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-03s7gllo@d0q^r+10@mxtc_*^@*)fgg#ny&v$o#olah&6!a#%*'
+SECRET_KEY = get_secret('SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = [
+DJANGO_APPS =[
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+]
+
+PROJECT_APPS =[
     'posts',
     'support',
     'users',
     'accounts',
-    'debug_toolbar',
+]
+
+THIRD_PARTY_APPS = [ # 운영환경에서 패키지를 설치할 필요는 없음
 ]
 
 MIDDLEWARE = [
@@ -61,15 +78,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -104,9 +112,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+
 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
