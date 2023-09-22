@@ -6,7 +6,7 @@ from django.http import Http404
 
 from rest_framework import generics
 from .models import Post
-from .serializers import PostSerializer
+from .serializers import PostSerializer, PostCreateSerializer, PostUpdateSerailizer, PostRetrieveSerailizer
 
 class PostView(APIView):
     def post(self, request):
@@ -51,21 +51,42 @@ class PostDetailView(APIView):
         post = self.get_object(pk)
         post.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)  
-    
+
+# 게시물 생성
 class PostCreateAPIView(generics.CreateAPIView):
     gueryset = Post.objects.all()
-    serializer_class = PostSerializer
+    serializer_class = PostCreateSerializer
     
     def perfrom_create(self, serializer):
         serializer.save(writer = self.request.user)
         
-class PostRetrieveAPIView(generics.RetrieveAPIView):
-    gueryset = Post.objects.all()
+# 사용자가 작성 한 것만 볼 수 있음
+class PostUserListAPIView(generics.ListAPIView):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
+    
+    def get_queryset(self):
+        user = self.request.user
+        return Post.objects.filter(writer = user) 
+
+# 모든 목록 다 볼 수 있음 
+class PostListAPIView(generics.ListAPIView):
+    queryset = Post.objects.all()
     serializer_class = PostSerializer
 
+# 모든 목록 검색
+class PostRetrieveAPIView(generics.RetrieveAPIView):
+    queryset = Post.objects.all()  
+    serializer_class = PostRetrieveSerailizer
+
+# 글 수정
 class PostUpdateAPIView(generics.UpdateAPIView):
     gueryset = Post.objects.all()
-    serializer_class = PostSerializer
+    serializer_class = PostUpdateSerailizer
+    
+    def get_queryset(self):
+        user = self.request.user
+        return Post.objects.filter(writer = user) 
 
 class PostDestroyAPIView(generics.DestroyAPIView):
     gueryset = Post.objects.all()

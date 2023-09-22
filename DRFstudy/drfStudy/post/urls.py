@@ -16,10 +16,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from post.views import PostDetailView,PostCreateAPIView
+from post.views import PostView, PostCreateAPIView, PostDetailView, PostUserListAPIView, PostListAPIView, PostRetrieveAPIView, PostUpdateAPIView, PostDestroyAPIView
 
 urlpatterns = [
-    path("postdetail/<int:pk>/",PostDetailView.as_view()),
-    path("apigeneric/",PostCreateAPIView.as_view()),
+    path('apiview/', PostView.as_view()),
+    path('apiview/<int:pk>', PostDetailView.as_view()),
+
+    path('generics/create', PostCreateAPIView.as_view()),
+    path('generics/list', PostListAPIView.as_view()),
+    path('generics/<int:pk>', PostRetrieveAPIView.as_view()),
+    path('generics/<int:pk>/update', PostUpdateAPIView.as_view()),
+    path('generics/<int:pk>/destroy', PostDestroyAPIView.as_view()),
 
 ]
